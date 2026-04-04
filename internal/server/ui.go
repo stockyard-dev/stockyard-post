@@ -1,27 +1,60 @@
 package server
 import "net/http"
-func(s *Server)dashboard(w http.ResponseWriter,r *http.Request){w.Header().Set("Content-Type","text/html; charset=utf-8");w.Write([]byte(dashHTML))}
-const dashHTML=`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Post</title>
-<style>:root{--bg:#1a1410;--bg2:#241e18;--bg3:#2e261e;--rust:#c45d2c;--rl:#e8753a;--leather:#a0845c;--cream:#f0e6d3;--cm:#7a7060;--gold:#d4a843;--green:#4a9e5c;--mono:'JetBrains Mono',Consolas,monospace;--serif:'Libre Baskerville',Georgia,serif}*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:13px;line-height:1.6}.hdr{padding:.6rem 1.2rem;border-bottom:1px solid var(--bg3);display:flex;justify-content:space-between;align-items:center}.hdr h1{font-family:var(--serif);font-size:1rem}.hdr h1 span{color:var(--rl)}.sub{font-size:.65rem;color:var(--cm)}.main{max-width:700px;margin:0 auto;padding:1rem}.search{width:100%;background:var(--bg2);border:1px solid var(--bg3);color:var(--cream);padding:.4rem .6rem;font-family:var(--mono);font-size:.78rem;margin-bottom:.6rem;outline:none}.search:focus{border-color:var(--rust)}.stats{display:flex;gap:1rem;margin-bottom:.8rem;flex-wrap:wrap}.stat{text-align:center}.stat-n{font-size:1.2rem;color:var(--rl);font-family:var(--serif)}.stat-l{font-size:.55rem;color:var(--cm);text-transform:uppercase;letter-spacing:1px}.btn{font-family:var(--mono);font-size:.68rem;padding:.3rem .6rem;border:1px solid;cursor:pointer;background:transparent}.btn-p{border-color:var(--rust);color:var(--rl)}.btn-p:hover{background:var(--rust);color:var(--cream)}.item{background:var(--bg2);border:1px solid var(--bg3);padding:.6rem;margin-bottom:.3rem;cursor:pointer;transition:border-color .15s}.item:hover{border-color:var(--leather)}.item h3{font-size:.82rem;margin-bottom:.15rem}.item-meta{font-size:.65rem;color:var(--cm);display:flex;gap:.5rem;flex-wrap:wrap}.empty{text-align:center;padding:2rem;color:var(--cm);font-style:italic;font-family:var(--serif)}.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:100}.modal{background:var(--bg2);border:1px solid var(--bg3);padding:1.5rem;width:90%;max-width:500px;max-height:90vh;overflow-y:auto}.modal h2{font-family:var(--serif);font-size:.9rem;margin-bottom:1rem}label.fl{display:block;font-size:.65rem;color:var(--leather);text-transform:uppercase;letter-spacing:1px;margin-bottom:.2rem;margin-top:.5rem}input[type=text],input[type=number]{background:var(--bg);border:1px solid var(--bg3);color:var(--cream);padding:.35rem .5rem;font-family:var(--mono);font-size:.78rem;width:100%;outline:none}.del{color:var(--cm);cursor:pointer;font-size:.65rem;float:right}.del:hover{color:var(--rust)}</style></head>
-<body><div class="hdr"><div><h1><span>Stockyard</span> Post</h1><div class="sub">Self-hosted blog engine</div></div><button class="btn btn-p" onclick="showModal()">+ New</button></div>
-<div class="main"><div id="upgrade-banner" style="display:none;background:#241e18;border:1px solid #8b3d1a;border-left:3px solid #c45d2c;padding:.6rem 1rem;font-size:.78rem;color:#bfb5a3;margin-bottom:.8rem"><strong style="color:#f0e6d3">Free tier</strong> — 10 items max. <a href="https://stockyard.dev/post/" target="_blank" style="color:#e8753a">Upgrade to Pro →</a></div><div class="stats" id="stats"></div>
-<input class="search" id="search" placeholder="Search articles..." oninput="debounceSearch()">
-<div id="list"></div></div>
-<div class="modal-bg" id="modal" style="display:none" onclick="if(event.target===this)hideModal()"><div class="modal"><h2 id="mt">New Article</h2>
-<label class="fl">Title</label><input type="text" id="f-title" placeholder="Title"><label class="fl">Body</label><input type="text" id="f-body" placeholder="Body"><label class="fl">Author</label><input type="text" id="f-author" placeholder="Author"><label class="fl">Slug</label><input type="text" id="f-slug" placeholder="Slug"><label class="fl">Category</label><input type="text" id="f-category" placeholder="Category"><label class="fl">Status</label><input type="text" id="f-status" placeholder="Status"><label class="fl">Published At</label><input type="text" id="f-published_at" placeholder="Published At">
-<div style="margin-top:1rem;display:flex;gap:.5rem"><button class="btn btn-p" onclick="save()">Save</button><button class="btn" style="color:var(--cm);border-color:var(--bg3)" onclick="hideModal()">Cancel</button></div></div></div>
+func(s *Server)dashboard(w http.ResponseWriter,r *http.Request){w.Header().Set("Content-Type","text/html");w.Write([]byte(dashHTML))}
+const dashHTML=`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Post</title>
+<style>:root{--bg:#1a1410;--bg2:#241e18;--bg3:#2e261e;--rust:#e8753a;--leather:#a0845c;--cream:#f0e6d3;--cd:#bfb5a3;--cm:#7a7060;--gold:#d4a843;--green:#4a9e5c;--mono:'JetBrains Mono',monospace;--serif:'Libre Baskerville',serif}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--cream);font-family:var(--serif);line-height:1.7}
+.hdr{padding:1rem 1.5rem;border-bottom:1px solid var(--bg3);display:flex;justify-content:space-between;align-items:center}.hdr h1{font-family:var(--mono);font-size:.9rem;letter-spacing:2px}
+.main{padding:1.5rem;max-width:800px;margin:0 auto}
+.post{border-bottom:1px solid var(--bg3);padding:1rem 0;cursor:pointer}
+.post:hover{background:var(--bg2);margin:0 -1rem;padding:1rem}
+.post-title{font-size:1.1rem;margin-bottom:.2rem}
+.post-meta{font-family:var(--mono);font-size:.6rem;color:var(--cm);display:flex;gap:.8rem}
+.post-excerpt{font-size:.85rem;color:var(--cd);margin-top:.3rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.badge-draft{color:var(--gold);background:#d4a84322;border:1px solid #d4a84344;font-family:var(--mono);font-size:.5rem;padding:.1rem .3rem;text-transform:uppercase;letter-spacing:1px}
+.badge-published{color:var(--green);background:#4a9e5c22;border:1px solid #4a9e5c44;font-family:var(--mono);font-size:.5rem;padding:.1rem .3rem;text-transform:uppercase;letter-spacing:1px}
+.editor{display:none;max-width:800px;margin:0 auto;padding:1.5rem}.editor.open{display:block}
+.editor input{width:100%;padding:.6rem .8rem;background:var(--bg2);border:1px solid var(--bg3);color:var(--cream);font-family:var(--serif);font-size:1.2rem;margin-bottom:.5rem}
+.editor textarea{width:100%;min-height:400px;background:var(--bg2);border:1px solid var(--bg3);color:var(--cream);font-family:var(--serif);font-size:.95rem;padding:1rem;line-height:1.8;resize:vertical}
+.editor-bar{display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap;align-items:center;font-family:var(--mono);font-size:.65rem}
+.editor-bar input,.editor-bar select{padding:.3rem .5rem;background:var(--bg);border:1px solid var(--bg3);color:var(--cream);font-family:var(--mono);font-size:.65rem}
+.btn{font-family:var(--mono);font-size:.6rem;padding:.3rem .7rem;cursor:pointer;border:1px solid var(--bg3);background:var(--bg);color:var(--cd)}.btn:hover{border-color:var(--leather);color:var(--cream)}
+.btn-p{background:var(--rust);border-color:var(--rust);color:var(--bg)}
+.btn-g{background:var(--green);border-color:var(--green);color:var(--bg)}
+.empty{text-align:center;padding:3rem;color:var(--cm);font-style:italic;font-size:.85rem}
+</style></head><body>
+<div class="hdr"><h1>POST</h1><button class="btn btn-p" onclick="newPost()">+ New Post</button></div>
+<div class="editor" id="editor">
+<input id="e-title" placeholder="Post title...">
+<div class="editor-bar"><label>Slug</label><input id="e-slug" style="width:150px"><label>Category</label><input id="e-cat" style="width:100px"><label>Author</label><input id="e-author" style="width:100px"><select id="e-status"><option value="draft">Draft</option><option value="published">Published</option></select></div>
+<textarea id="e-body" placeholder="Write in Markdown..."></textarea>
+<div style="display:flex;justify-content:space-between;margin-top:.5rem"><button class="btn" onclick="cancelEdit()">Cancel</button><div style="display:flex;gap:.4rem"><button class="btn" onclick="saveDraft()">Save Draft</button><button class="btn btn-g" onclick="publish()">Publish</button></div></div>
+</div>
+<div class="main" id="main"></div>
 <script>
-const API="/api/articles";let editId=null,timer=null,curFilter="";
-function stc(s){return{"active":"#4a9e5c","open":"#4a9e5c","available":"#4a9e5c","growing":"#4a9e5c","done":"#4a9e5c","completed":"#4a9e5c","published":"#4a9e5c","resolved":"#4a9e5c","decided":"#4a9e5c","closed_won":"#4a9e5c","converted":"#4a9e5c","live":"#4a9e5c","applied":"#4a9e5c","sent":"#4a9e5c","approved":"#4a9e5c","booked":"#d4a843","in_progress":"#d4a843","processing":"#d4a843","reading":"#d4a843","investigating":"#d4a843","identified":"#d4a843","monitoring":"#d4a843","deploying":"#d4a843","qualified":"#d4a843","proposal":"#d4a843","negotiation":"#d4a843","assigned":"#d4a843","contacted":"#d4a843","pending":"#a0845c","draft":"#a0845c","unread":"#a0845c","new":"#a0845c","lead":"#a0845c","planning":"#a0845c","proposed":"#a0845c","trial":"#a0845c","failed":"#c45d2c","closed":"#7a7060","archived":"#7a7060","inactive":"#7a7060","closed_lost":"#c45d2c","churned":"#c45d2c","declined":"#c45d2c","rejected":"#c45d2c","rolled_back":"#c45d2c","superseded":"#7a7060","dormant":"#7a7060","paused":"#7a7060","stalled":"#c45d2c","away":"#a0845c","busy":"#c45d2c","offline":"#7a7060","dnd":"#c45d2c","bronze":"#a0845c","silver":"#bfb5a3","gold":"#d4a843","platinum":"#f0e6d3"}[s]||"#7a7060"}
-function showModal(id){editId=id||null;document.getElementById("mt").textContent=id?"Edit":"New";if(id){fetch(API+"/"+id).then(r=>r.json()).then(e=>{document.getElementById("f-title").value=e.title||"";document.getElementById("f-body").value=e.body||"";document.getElementById("f-author").value=e.author||"";document.getElementById("f-slug").value=e.slug||"";document.getElementById("f-category").value=e.category||"";document.getElementById("f-status").value=e.status||"";document.getElementById("f-published_at").value=e.published_at||"";})}else{document.getElementById("f-title").value="";document.getElementById("f-body").value="";document.getElementById("f-author").value="";document.getElementById("f-slug").value="";document.getElementById("f-category").value="";document.getElementById("f-status").value="";document.getElementById("f-published_at").value=""}document.getElementById("modal").style.display="flex"}
-function hideModal(){document.getElementById("modal").style.display="none";editId=null}
-function debounceSearch(){clearTimeout(timer);timer=setTimeout(load,300)}
-function filterBy(v){curFilter=v;load()}
-async function loadStats(){const r=await fetch("/api/stats");const d=await r.json();const el=document.getElementById("stats");let h='<div class="stat"><div class="stat-n">'+d.total+'</div><div class="stat-l">Total</div></div>';if(d.by_status){for(const[k,v]of Object.entries(d.by_status)){h+='<div class="stat"><div class="stat-n" style="color:'+stc(k)+'">'+v+'</div><div class="stat-l">'+k.replace(/_/g," ")+'</div></div>'}};el.innerHTML=h}
-async function load(){let url=API;const q=document.getElementById("search").value;const p=[];if(q)p.push("q="+encodeURIComponent(q));if(curFilter)p.push("status="+curFilter);if(p.length)url+="?"+p.join("&");const r=await fetch(url);const d=await r.json();const items=d.articles||[];const el=document.getElementById("list");if(!items.length){el.innerHTML='<div class="empty">No articles yet</div>';loadStats();return}
-el.innerHTML=items.map(e=>{return '<div class="item" ondblclick="showModal(\''+e.id+'\')"><span class="del" onclick="event.stopPropagation();del(\''+e.id+'\')">x</span><h3>'+e.title+'</h3><div class="item-meta"><span>${e.body||"\u2014"}</span><span>${e.author||"\u2014"}</span><span>${e.slug||"\u2014"}</span><span>${e.category||"\u2014"}</span></div></div>'}).join("");loadStats()}
-async function save(){const body={"title":document.getElementById("f-title").value,"body":document.getElementById("f-body").value,"author":document.getElementById("f-author").value,"slug":document.getElementById("f-slug").value,"category":document.getElementById("f-category").value,"status":document.getElementById("f-status").value,"published_at":document.getElementById("f-published_at").value};const method=editId?"PUT":"POST";const url=editId?API+"/"+editId:API;await fetch(url,{method,headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});hideModal();load()}
-async function del(id){await fetch(API+"/"+id,{method:"DELETE"});load()}
-load();loadStats()
-fetch('/api/tier').then(r=>r.json()).then(j=>{if(j.tier==='free'){var b=document.getElementById('upgrade-banner');if(b)b.style.display='block'}}).catch(()=>{var b=document.getElementById('upgrade-banner');if(b)b.style.display='block'});
+const A='/api';let articles=[],editId=null;
+async function load(){const r=await fetch(A+'/articles').then(r=>r.json());articles=r.articles||[];render();}
+function render(){if(!articles.length){document.getElementById('main').innerHTML='<div class="empty">No posts yet. Write your first one.</div>';return;}
+const drafts=articles.filter(a=>a.status==='draft'),published=articles.filter(a=>a.status==='published');
+let h='';
+if(published.length){h+='<div style="font-family:var(--mono);font-size:.6rem;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem">Published ('+published.length+')</div>';published.forEach(a=>{h+=postCard(a)});}
+if(drafts.length){h+='<div style="font-family:var(--mono);font-size:.6rem;color:var(--gold);margin:1rem 0 .5rem;text-transform:uppercase;letter-spacing:1px">Drafts ('+drafts.length+')</div>';drafts.forEach(a=>{h+=postCard(a)});}
+document.getElementById('main').innerHTML=h;}
+function postCard(a){let h='<div class="post" onclick="editPost(\''+a.id+'\')"><div style="display:flex;justify-content:space-between"><div class="post-title">'+esc(a.title||'Untitled')+'</div><span class="badge-'+a.status+'">'+a.status+'</span></div><div class="post-meta">';
+if(a.author)h+='<span>'+esc(a.author)+'</span>';if(a.category)h+='<span>'+esc(a.category)+'</span>';
+if(a.published_at)h+='<span>Published '+ft(a.published_at)+'</span>';else h+='<span>'+ft(a.created_at)+'</span>';
+if(a.slug)h+='<span>/'+esc(a.slug)+'</span>';
+h+='</div>';if(a.body)h+='<div class="post-excerpt">'+esc(a.body)+'</div>';h+='</div>';return h;}
+function newPost(){editId=null;document.getElementById('e-title').value='';document.getElementById('e-body').value='';document.getElementById('e-slug').value='';document.getElementById('e-cat').value='';document.getElementById('e-author').value='';document.getElementById('e-status').value='draft';document.getElementById('editor').classList.add('open');document.getElementById('e-title').focus();}
+function editPost(id){const a=articles.find(x=>x.id===id);if(!a)return;editId=id;document.getElementById('e-title').value=a.title||'';document.getElementById('e-body').value=a.body||'';document.getElementById('e-slug').value=a.slug||'';document.getElementById('e-cat').value=a.category||'';document.getElementById('e-author').value=a.author||'';document.getElementById('e-status').value=a.status;document.getElementById('editor').classList.add('open');}
+function cancelEdit(){document.getElementById('editor').classList.remove('open');editId=null;}
+async function saveDraft(){await savePost('draft');}
+async function publish(){await savePost('published');}
+async function savePost(status){const data={title:document.getElementById('e-title').value,body:document.getElementById('e-body').value,slug:document.getElementById('e-slug').value,category:document.getElementById('e-cat').value,author:document.getElementById('e-author').value,status};
+if(editId){await fetch(A+'/articles/'+editId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}
+else{await fetch(A+'/articles',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}
+cancelEdit();load();}
+function ft(t){if(!t)return'';return new Date(t).toLocaleDateString();}
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+load();
 </script></body></html>`
